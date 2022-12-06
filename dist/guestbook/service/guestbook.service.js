@@ -22,6 +22,7 @@ let GuestbookService = class GuestbookService {
     }
     async createGuestbook(guestbookData, files) {
         const create = await this.guestbookRepository.create(guestbookData, files);
+        console.log('create : ', create);
         return create.readOnlyData;
     }
 };
