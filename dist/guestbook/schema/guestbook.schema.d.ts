@@ -29,15 +29,19 @@ export declare class Guestbook extends Document {
     content: string;
     images: string;
     status: string;
-    createdAt: string;
+    index: number;
+    createdAt: Date;
+    updatedAt: Date;
     readonly readOnlyData: {
         name: string;
         content: string;
         email: string;
         images: string;
         status: string;
+        index: number;
         id: string;
         createdAt: string;
+        updatedAt: string;
     };
 }
 export declare const GuestbookSchema: import("mongoose").Schema<Guestbook, import("mongoose").Model<Guestbook, any, any, any, any>, {}, {}, {}, {}, "type", Guestbook>;
