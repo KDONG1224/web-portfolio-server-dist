@@ -28,6 +28,3 @@ nest.js, typescript, mongodb를 활용하여 저만의 포트폴리오 api를 �
 
 - 게시글 썸네일 업로드 기능 (nestjs - multer 기능과 통신 -> formData)
 - 카테고리 별 엑셀 다운로드 기능 구현
-- Main 페이지 구현
-- About 페이지 구현
-- Algorithm 페이지 구현
