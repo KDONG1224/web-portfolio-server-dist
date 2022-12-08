@@ -82,9 +82,23 @@ __decorate([
     (0, mongoose_1.Prop)({
         required: false,
     }),
-    (0, class_validator_1.IsString)(),
-    __metadata("design:type", String)
+    (0, class_validator_1.IsNumber)(),
+    __metadata("design:type", Number)
+], Guestbook.prototype, "index", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({
+        required: false,
+    }),
+    (0, class_validator_1.IsDate)(),
+    __metadata("design:type", Date)
 ], Guestbook.prototype, "createdAt", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({
+        required: false,
+    }),
+    (0, class_validator_1.IsDate)(),
+    __metadata("design:type", Date)
+], Guestbook.prototype, "updatedAt", void 0);
 Guestbook = __decorate([
     (0, mongoose_1.Schema)(options)
 ], Guestbook);
@@ -98,6 +112,8 @@ _GuestbookSchema.virtual('readOnlyData').get(function () {
         images: this.images,
         status: this.status,
         createdAt: this.createdAt,
+        updatedAt: this.updatedAt,
+        index: this.index,
         id: this.id,
     };
 });

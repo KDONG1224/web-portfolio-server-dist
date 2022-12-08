@@ -12,7 +12,9 @@ export declare class GuestbookController {
         email: string;
         images: string;
         status: string;
+        index: number;
         id: string;
         createdAt: string;
+        updatedAt: string;
     }>;
 }

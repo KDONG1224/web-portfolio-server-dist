@@ -29,8 +29,6 @@ let GuestbookController = class GuestbookController {
         console.log(filter);
     }
     createReference(files, guestbookData) {
-        console.log('A : ', guestbookData);
-        console.log('A : ', files);
         return this.guestbookService.createGuestbook(guestbookData, files);
     }
 };

@@ -28,16 +28,13 @@ let GuestbookRepository = class GuestbookRepository {
         return result;
     }
     async create(guestbookData, files) {
-        if (!files['images']) {
-            throw new common_1.HttpException({
-                statusCode: common_1.HttpStatus.BAD_REQUEST,
-                message: '이미지가 존재하지 않습니다.',
-            }, common_1.HttpStatus.BAD_REQUEST);
-        }
         try {
-            const fileUpload = await this.awsUploadService.uploadFileToS3('guestbook', files['images'][0]);
-            const fileUrl = this.awsUploadService.getAwsS3FileUrl(fileUpload.key);
-            const result = await this.guestbookModel.create(Object.assign(Object.assign({ status: 'active' }, guestbookData), { images: fileUrl }));
+            const fileUpload = files['images'] &&
+                (await this.awsUploadService.uploadFileToS3('guestbook', files['images'][0]));
+            const fileUrl = fileUpload && this.awsUploadService.getAwsS3FileUrl(fileUpload.key);
+            const findAll = await this.guestbookModel.find();
+            const find = findAll.length > 0 && findAll[findAll.length - 1];
+            const result = await this.guestbookModel.create(Object.assign(Object.assign({ index: find ? find.index + 1 : 1, status: 'active' }, guestbookData), { images: fileUrl }));
             return result;
         }
         catch (error) {

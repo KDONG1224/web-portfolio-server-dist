@@ -11,7 +11,9 @@ export declare class GuestbookService {
         email: string;
         images: string;
         status: string;
+        index: number;
         id: string;
         createdAt: string;
+        updatedAt: string;
     }>;
 }
