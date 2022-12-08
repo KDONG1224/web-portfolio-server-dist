@@ -31,4 +31,4 @@ export declare class Events extends Document {
         index: number;
     };
 }
-export declare const ToyProjectsSchema: import("mongoose").Schema<Events, import("mongoose").Model<Events, any, any, any, any>, {}, {}, {}, {}, "type", Events>;
+export declare const EventsSchema: import("mongoose").Schema<Events, import("mongoose").Model<Events, any, any, any, any>, {}, {}, {}, {}, "type", Events>;

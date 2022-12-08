@@ -6,7 +6,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ToyProjectsSchema = exports.Events = void 0;
+exports.EventsSchema = exports.Events = void 0;
 const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
 const options = {
@@ -25,5 +25,5 @@ _EventsSchema.virtual('readOnlyData').get(function () {
 });
 _EventsSchema.set('toObject', { virtuals: true });
 _EventsSchema.set('toJSON', { virtuals: true });
-exports.ToyProjectsSchema = _EventsSchema;
+exports.EventsSchema = _EventsSchema;
 //# sourceMappingURL=event.schema.js.map
