@@ -22,6 +22,7 @@ const reference_module_1 = require("./reference/module/reference.module");
 const toy_projects_module_1 = require("./toy-projects/module/toy-projects.module");
 const aws_upload_module_1 = require("./aws-upload/module/aws-upload.module");
 const guestbook_module_1 = require("./guestbook/modules/guestbook.module");
+const event_module_1 = require("./event/module/event.module");
 let AppModule = class AppModule {
     constructor() {
         this.isDev = process.env.MODE === 'dev' ? true : false;
@@ -43,6 +44,7 @@ AppModule = __decorate([
             toy_projects_module_1.ToyProjectsModule,
             aws_upload_module_1.AwsUploadModule,
             guestbook_module_1.GuestbookModule,
+            event_module_1.EventModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],

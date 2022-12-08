@@ -25,6 +25,10 @@ let ToyProjectsRepository = class ToyProjectsRepository {
         const result = await this.toyProjectModel.find();
         return result;
     }
+    async find(filter) {
+        const result = await this.toyProjectModel.find(filter);
+        return result;
+    }
 };
 ToyProjectsRepository = __decorate([
     (0, common_1.Injectable)(),

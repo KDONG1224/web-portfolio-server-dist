@@ -29,6 +29,7 @@ __decorate([
 ], AppController.prototype, "getHello", null);
 AppController = __decorate([
     (0, swagger_1.ApiTags)('Hello Kdong'),
+    (0, swagger_1.ApiExcludeController)(),
     (0, common_1.Controller)(),
     __metadata("design:paramtypes", [app_service_1.AppService])
 ], AppController);

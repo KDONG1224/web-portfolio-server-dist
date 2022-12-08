@@ -8,6 +8,9 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ToyProjectsController = void 0;
 const common_1 = require("@nestjs/common");
@@ -20,6 +23,9 @@ let ToyProjectsController = class ToyProjectsController {
     getAllToyProjects() {
         return this.toyProjectsService.getAllToyProjects();
     }
+    getToyProject(filter) {
+        return this.toyProjectsService.getToyProject(JSON.parse(filter));
+    }
 };
 __decorate([
     (0, common_1.Get)('all'),
@@ -27,6 +33,13 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", void 0)
 ], ToyProjectsController.prototype, "getAllToyProjects", null);
+__decorate([
+    (0, common_1.Get)('/:filter'),
+    __param(0, (0, common_1.Param)('filter')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], ToyProjectsController.prototype, "getToyProject", null);
 ToyProjectsController = __decorate([
     (0, swagger_1.ApiTags)('Toy-Projects'),
     (0, common_1.Controller)('toy-projects'),

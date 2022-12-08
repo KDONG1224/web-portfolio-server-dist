@@ -22,13 +22,13 @@
 /// <reference types="mongoose/types/validation" />
 /// <reference types="mongoose/types/virtuals" />
 /// <reference types="mongoose/types/inferschematype" />
-import { FilterQuery } from 'mongoose';
-import { ToyProjectsRepository } from '../repository/toy-projects.repository';
-export declare class ToyProjectsService {
-    private readonly toyProjectsRepository;
-    constructor(toyProjectsRepository: ToyProjectsRepository);
-    getAllToyProjects(): Promise<(import("../schema/toy-projects.schema").ToyProjects & {
-        _id: import("mongoose").Types.ObjectId;
-    })[]>;
-    getToyProject(filter: FilterQuery<any>): Promise<any>;
+import { Document } from 'mongoose';
+export declare class Events extends Document {
+    readonly readOnlyData: {
+        title: string;
+        contents: string;
+        status: string;
+        index: number;
+    };
 }
+export declare const ToyProjectsSchema: import("mongoose").Schema<Events, import("mongoose").Model<Events, any, any, any, any>, {}, {}, {}, {}, "type", Events>;

@@ -20,6 +20,10 @@ let ToyProjectsService = class ToyProjectsService {
         const allToyProjects = await this.toyProjectsRepository.findAll();
         return allToyProjects;
     }
+    async getToyProject(filter) {
+        const toyproject = await this.toyProjectsRepository.find(filter);
+        return toyproject;
+    }
 };
 ToyProjectsService = __decorate([
     (0, common_1.Injectable)(),

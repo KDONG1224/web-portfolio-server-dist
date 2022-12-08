@@ -30,4 +30,5 @@ export declare class ToyProjectsController {
     getAllToyProjects(): Promise<(import("../schema/toy-projects.schema").ToyProjects & {
         _id: import("mongoose").Types.ObjectId;
     })[]>;
+    getToyProject(filter: string): Promise<any>;
 }
