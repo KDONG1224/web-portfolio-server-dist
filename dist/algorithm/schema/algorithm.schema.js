@@ -35,7 +35,7 @@ __decorate([
 ], Algorithm.prototype, "title", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({
-        example: '문제내용',
+        example: '문제 질문',
         description: 'question',
         required: true,
     }),
@@ -47,8 +47,8 @@ __decorate([
 ], Algorithm.prototype, "question", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({
-        example: '입력 설명',
-        description: 'inputDesc',
+        example: '문제 힌트',
+        description: 'hint',
         required: true,
     }),
     (0, mongoose_1.Prop)({
@@ -56,11 +56,11 @@ __decorate([
     }),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
-], Algorithm.prototype, "inputDesc", void 0);
+], Algorithm.prototype, "hint", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({
-        example: '출력 설명',
-        description: 'outputDesc',
+        example: '난이도',
+        description: 'level',
         required: true,
     }),
     (0, mongoose_1.Prop)({
@@ -68,11 +68,11 @@ __decorate([
     }),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
-], Algorithm.prototype, "outputDesc", void 0);
+], Algorithm.prototype, "level", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({
-        example: '입력 예제',
-        description: 'inputEx',
+        example: '타입',
+        description: 'type',
         required: true,
     }),
     (0, mongoose_1.Prop)({
@@ -80,11 +80,11 @@ __decorate([
     }),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
-], Algorithm.prototype, "inputEx", void 0);
+], Algorithm.prototype, "type", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({
-        example: '출력 예제',
-        description: 'outputEx',
+        example: '나의 풀이 해석',
+        description: 'grassMyDesc',
         required: true,
     }),
     (0, mongoose_1.Prop)({
@@ -92,7 +92,55 @@ __decorate([
     }),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
-], Algorithm.prototype, "outputEx", void 0);
+], Algorithm.prototype, "grassMyDesc", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        example: '다른 풀이 해석',
+        description: 'grassDifferDesc',
+        required: true,
+    }),
+    (0, mongoose_1.Prop)({
+        required: true,
+    }),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], Algorithm.prototype, "grassDifferDesc", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        example: '나의 풀이',
+        description: 'grassMyCode',
+        required: true,
+    }),
+    (0, mongoose_1.Prop)({
+        required: true,
+    }),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], Algorithm.prototype, "grassMyCode", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        example: '다른 풀이',
+        description: 'grassDifferCode',
+        required: true,
+    }),
+    (0, mongoose_1.Prop)({
+        required: true,
+    }),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], Algorithm.prototype, "grassDifferCode", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        example: '썸네일',
+        description: 'thumbmnaile',
+        required: false,
+    }),
+    (0, mongoose_1.Prop)({
+        required: false,
+    }),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], Algorithm.prototype, "thumbmnaile", void 0);
 __decorate([
     (0, mongoose_1.Prop)({
         required: false,
@@ -116,12 +164,17 @@ _AlgorithmSchema.virtual('readOnlyData').get(function () {
     return {
         title: this.title,
         question: this.question,
-        inputDesc: this.inputDesc,
-        outputDesc: this.outputDesc,
-        inputEx: this.inputEx,
-        outputEx: this.outputEx,
+        hint: this.hint,
+        type: this.type,
+        level: this.level,
+        grassMyDesc: this.grassMyDesc,
+        grassDifferDesc: this.grassDifferDesc,
+        grassMyCode: this.grassMyCode,
+        grassDifferCode: this.grassDifferCode,
+        thumbmnaile: this.thumbmnaile,
         status: this.status,
         index: this.index,
+        id: this.id,
     };
 });
 _AlgorithmSchema.set('toObject', { virtuals: true });

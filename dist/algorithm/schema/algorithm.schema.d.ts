@@ -26,21 +26,30 @@ import { Document } from 'mongoose';
 export declare class Algorithm extends Document {
     title: string;
     question: string;
-    inputDesc: string;
-    outputDesc: string;
-    inputEx: string;
-    outputEx: string;
+    hint: string;
+    level: string;
+    type: string;
+    grassMyDesc: string;
+    grassDifferDesc: string;
+    grassMyCode: string;
+    grassDifferCode: string;
+    thumbmnaile: string;
     index: number;
     status: string;
     readonly readOnlyData: {
         title: string;
         question: string;
-        inputDesc: string;
-        outputDesc: string;
-        inputEx: string;
-        outputEx: string;
+        hint: string;
+        type: string;
+        level: number;
+        grassMyDesc: string;
+        grassDifferDesc: string;
+        grassMyCode: string;
+        grassDifferCode: string;
+        thumbmnaile: string;
         status: string;
         index: number;
+        id: string;
     };
 }
 export declare const AlgorithmSchema: import("mongoose").Schema<Algorithm, import("mongoose").Model<Algorithm, any, any, any, any>, {}, {}, {}, {}, "type", Algorithm>;

@@ -17,17 +17,20 @@ let AlgorithmService = class AlgorithmService {
         this.algorithmRepository = algorithmRepository;
     }
     async getAllAlgorithm() {
-        const allAlgorithm = await this.algorithmRepository.findAll();
-        const algorithmLists = [];
-        allAlgorithm.forEach((algorithm) => {
-            const _result = Object.assign({ id: algorithm.id }, algorithm.readOnlyData);
-            return algorithmLists.push(_result);
-        });
-        return algorithmLists;
+        const result = await this.algorithmRepository.findAll();
+        return result;
     }
-    async createAlgorithm(data) {
-        const algorithm = await this.algorithmRepository.create(Object.assign({}, data));
-        return algorithm.readOnlyData;
+    async getAlgorithmLists(filter) {
+        const referenceLists = await this.algorithmRepository.find(filter);
+        return referenceLists;
+    }
+    async createAlgorithm(data, files) {
+        const create = await this.algorithmRepository.create(data, files);
+        return create.readOnlyData;
+    }
+    async updateAlgorithm(id, files, datas) {
+        const update = await this.algorithmRepository.update(id, files, datas);
+        return update.readOnlyData;
     }
 };
 AlgorithmService = __decorate([

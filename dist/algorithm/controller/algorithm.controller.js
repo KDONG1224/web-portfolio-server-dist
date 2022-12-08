@@ -14,8 +14,9 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AlgorithmController = void 0;
 const common_1 = require("@nestjs/common");
+const platform_express_1 = require("@nestjs/platform-express");
 const swagger_1 = require("@nestjs/swagger");
-const algorithm_create_dto_1 = require("../dto/algorithm.create.dto");
+const aws_upload_upload_dto_1 = require("../../aws-upload/dto/aws-upload.upload.dto");
 const algorithm_service_1 = require("../service/algorithm.service");
 let AlgorithmController = class AlgorithmController {
     constructor(algorithmService) {
@@ -24,8 +25,14 @@ let AlgorithmController = class AlgorithmController {
     getAllAlgorithm() {
         return this.algorithmService.getAllAlgorithm();
     }
-    createAlgorithm(data) {
-        return this.algorithmService.createAlgorithm(data);
+    getReferenceLists(filter) {
+        return this.algorithmService.getAlgorithmLists(JSON.parse(filter));
+    }
+    createAlgorithm(files, createAlgorithmData) {
+        return this.algorithmService.createAlgorithm(createAlgorithmData, files);
+    }
+    updateAlgorithm(algorithmId, files, datas) {
+        return this.algorithmService.updateAlgorithm(algorithmId, files, datas);
     }
 };
 __decorate([
@@ -35,12 +42,35 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], AlgorithmController.prototype, "getAllAlgorithm", null);
 __decorate([
-    (0, common_1.Post)('create'),
-    __param(0, (0, common_1.Body)()),
+    (0, common_1.Get)('/:filter'),
+    __param(0, (0, common_1.Param)('filter')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [algorithm_create_dto_1.AlgorithmCreateDto]),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], AlgorithmController.prototype, "getReferenceLists", null);
+__decorate([
+    (0, common_1.Post)('create'),
+    (0, swagger_1.ApiConsumes)('/form-data'),
+    (0, aws_upload_upload_dto_1.FileUploadDto)(['thumbmnaile']),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileFieldsInterceptor)([{ name: 'thumbmnaile', maxCount: 1 }])),
+    __param(0, (0, common_1.UploadedFiles)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Array, Object]),
     __metadata("design:returntype", void 0)
 ], AlgorithmController.prototype, "createAlgorithm", null);
+__decorate([
+    (0, common_1.Patch)('update/:id'),
+    (0, swagger_1.ApiConsumes)('/form-data'),
+    (0, aws_upload_upload_dto_1.FileUploadDto)(['thumbmnaile']),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileFieldsInterceptor)([{ name: 'thumbmnaile', maxCount: 1 }])),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.UploadedFiles)()),
+    __param(2, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Array, Object]),
+    __metadata("design:returntype", void 0)
+], AlgorithmController.prototype, "updateAlgorithm", null);
 AlgorithmController = __decorate([
     (0, swagger_1.ApiTags)('Algorithm'),
     (0, common_1.Controller)('algorithm'),

@@ -10,6 +10,7 @@ exports.AlgorithmModule = void 0;
 const common_1 = require("@nestjs/common");
 const config_1 = require("@nestjs/config");
 const mongoose_1 = require("@nestjs/mongoose");
+const aws_upload_module_1 = require("../../aws-upload/module/aws-upload.module");
 const algorithm_controller_1 = require("../controller/algorithm.controller");
 const algorithm_repository_1 = require("../repository/algorithm.repository");
 const algorithm_schema_1 = require("../schema/algorithm.schema");
@@ -23,6 +24,7 @@ AlgorithmModule = __decorate([
             mongoose_1.MongooseModule.forFeature([
                 { name: algorithm_schema_1.Algorithm.name, schema: algorithm_schema_1.AlgorithmSchema },
             ]),
+            (0, common_1.forwardRef)(() => aws_upload_module_1.AwsUploadModule),
         ],
         controllers: [algorithm_controller_1.AlgorithmController],
         providers: [algorithm_service_1.AlgorithmService, algorithm_repository_1.AlgorithmRepository],

@@ -16,26 +16,67 @@ exports.AlgorithmRepository = void 0;
 const common_1 = require("@nestjs/common");
 const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
+const aws_upload_service_1 = require("../../aws-upload/service/aws-upload.service");
 const algorithm_schema_1 = require("../schema/algorithm.schema");
 let AlgorithmRepository = class AlgorithmRepository {
-    constructor(algorithmMoel) {
+    constructor(algorithmMoel, awsUploadService) {
         this.algorithmMoel = algorithmMoel;
+        this.awsUploadService = awsUploadService;
     }
     async findAll() {
         const result = await this.algorithmMoel.find();
         return result;
     }
-    async create(algorithm) {
-        const findAll = await this.algorithmMoel.find();
-        const find = findAll.length > 0 && findAll[findAll.length - 1];
-        const result = await this.algorithmMoel.create(Object.assign({ index: find ? find.index + 1 : 1, status: 'active' }, algorithm));
-        return result;
+    async find(filter) {
+        const result = await this.algorithmMoel.find(filter);
+        const res = result.map(({ readOnlyData }) => (Object.assign({}, readOnlyData)));
+        return res;
+    }
+    async create(datas, files) {
+        if (!files['thumbmnaile']) {
+            throw new common_1.HttpException({
+                statusCode: common_1.HttpStatus.BAD_REQUEST,
+                message: '썸네일이 존재하지 않습니다.',
+            }, common_1.HttpStatus.BAD_REQUEST);
+        }
+        try {
+            const { grassDifferCode, grassMyCode } = datas;
+            const findAll = await this.algorithmMoel.find();
+            const find = findAll.length > 0 && findAll[findAll.length - 1];
+            const fileUpload = await this.awsUploadService.uploadFileToS3('reference', files['thumbmnaile'][0]);
+            const fileUrl = this.awsUploadService.getAwsS3FileUrl(fileUpload.key);
+            const result = await this.algorithmMoel.create(Object.assign(Object.assign({ index: find ? find.index + 1 : 1, status: 'active' }, datas), { grassDifferCode: grassDifferCode, grassMyCode: grassMyCode, thumbmnaile: fileUrl }));
+            return result;
+        }
+        catch (error) {
+            console.error(error);
+        }
+    }
+    async update(id, files, datas) {
+        try {
+            let thumbUrl = '';
+            if (Object.keys(files).length !== 0) {
+                const fileUpload = await this.awsUploadService.uploadFileToS3('algorithm', files['thumbmnaile'][0]);
+                const fileUrl = this.awsUploadService.getAwsS3FileUrl(fileUpload.key);
+                thumbUrl = fileUrl;
+            }
+            else {
+                thumbUrl = datas.thumbmnaile;
+            }
+            const reference = await this.algorithmMoel.findByIdAndUpdate(id, Object.assign(Object.assign({}, datas), { grassDifferCode: datas.grassDifferCode, grassMyCode: datas.grassMyCode, thumbmnaile: thumbUrl }));
+            const find = await this.algorithmMoel.findById(reference.id);
+            return find;
+        }
+        catch (error) {
+            console.error(error);
+        }
     }
 };
 AlgorithmRepository = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, mongoose_1.InjectModel)(algorithm_schema_1.Algorithm.name)),
-    __metadata("design:paramtypes", [mongoose_2.Model])
+    __metadata("design:paramtypes", [mongoose_2.Model,
+        aws_upload_service_1.AwsUploadService])
 ], AlgorithmRepository);
 exports.AlgorithmRepository = AlgorithmRepository;
 //# sourceMappingURL=algorithm.repository.js.map
