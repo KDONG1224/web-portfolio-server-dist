@@ -29,6 +29,14 @@ let ToyProjectsRepository = class ToyProjectsRepository {
         const result = await this.toyProjectModel.find(filter);
         return result;
     }
+    async findEid(gameName) {
+        const result = await this.toyProjectModel.findOne({
+            where: {
+                gameName,
+            },
+        });
+        return result.id;
+    }
 };
 ToyProjectsRepository = __decorate([
     (0, common_1.Injectable)(),

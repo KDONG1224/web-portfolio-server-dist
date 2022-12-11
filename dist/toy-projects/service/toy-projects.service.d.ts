@@ -31,4 +31,5 @@ export declare class ToyProjectsService {
         _id: import("mongoose").Types.ObjectId;
     })[]>;
     getToyProject(filter: FilterQuery<any>): Promise<any>;
+    getEid(gameName: string): Promise<any>;
 }

@@ -24,6 +24,10 @@ let ToyProjectsService = class ToyProjectsService {
         const toyproject = await this.toyProjectsRepository.find(filter);
         return toyproject;
     }
+    async getEid(gameName) {
+        const eId = await this.toyProjectsRepository.findEid(gameName);
+        return eId;
+    }
 };
 ToyProjectsService = __decorate([
     (0, common_1.Injectable)(),
