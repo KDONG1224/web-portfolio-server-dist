@@ -6,7 +6,7 @@ export declare class EventController {
     enterV2(): Promise<void>;
     playStart(eId: string, req: any): Promise<any>;
     playEnd(eId: string, score: string, coin: any, userToken: string, defaultScore: any, req: any): Promise<void>;
-    myRanking(eId: string, userToken: string, req: any): Promise<void>;
+    myRanking(eId: string, userToken: string, req: Request): Promise<void>;
     ranking(eId: string, rank: any): Promise<any[]>;
     profile(eId: string, userToken: string, req: any): Promise<void>;
     buy(eId: string, char: any, userToken: any, req: any): Promise<void>;

@@ -20,6 +20,7 @@ export declare class AlgorithmController {
         status: string;
         index: number;
         id: string;
+        createdAt: Date;
     }>;
     updateAlgorithm(algorithmId: string, files: Array<Express.Multer.File>, datas: ResponseAlgorithmProps): Promise<{
         title: string;
@@ -35,5 +36,6 @@ export declare class AlgorithmController {
         status: string;
         index: number;
         id: string;
+        createdAt: Date;
     }>;
 }

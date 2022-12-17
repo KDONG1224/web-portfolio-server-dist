@@ -36,6 +36,7 @@ export declare class Algorithm extends Document {
     thumbmnaile: string;
     index: number;
     status: string;
+    createdAt: Date;
     readonly readOnlyData: {
         title: string;
         question: string;
@@ -50,6 +51,7 @@ export declare class Algorithm extends Document {
         status: string;
         index: number;
         id: string;
+        createdAt: Date;
     };
 }
 export declare const AlgorithmSchema: import("mongoose").Schema<Algorithm, import("mongoose").Model<Algorithm, any, any, any, any>, {}, {}, {}, {}, "type", Algorithm>;

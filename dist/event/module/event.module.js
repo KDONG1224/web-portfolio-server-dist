@@ -15,13 +15,17 @@ const mongoose_1 = require("@nestjs/mongoose");
 const event_schema_1 = require("../schema/event.schema");
 const event_repository_1 = require("../repository/event.repository");
 const toy_projects_module_1 = require("../../toy-projects/module/toy-projects.module");
+const toy_projects_schema_1 = require("../../toy-projects/schema/toy-projects.schema");
 let EventModule = class EventModule {
 };
 EventModule = __decorate([
     (0, common_1.Module)({
         imports: [
             config_1.ConfigModule.forRoot(),
-            mongoose_1.MongooseModule.forFeature([{ name: event_schema_1.Events.name, schema: event_schema_1.EventsSchema }]),
+            mongoose_1.MongooseModule.forFeature([
+                { name: event_schema_1.Events.name, schema: event_schema_1.EventsSchema },
+                { name: toy_projects_schema_1.ToyProjects.name, schema: toy_projects_schema_1.ToyProjectsSchema },
+            ]),
             (0, common_1.forwardRef)(() => toy_projects_module_1.ToyProjectsModule),
         ],
         controllers: [event_controller_1.EventController],

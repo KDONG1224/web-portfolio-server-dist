@@ -22,6 +22,7 @@ export declare class AlgorithmService {
         status: string;
         index: number;
         id: string;
+        createdAt: Date;
     }>;
     updateAlgorithm(id: string, files: Array<Express.Multer.File>, datas: ResponseAlgorithmProps): Promise<{
         title: string;
@@ -37,5 +38,6 @@ export declare class AlgorithmService {
         status: string;
         index: number;
         id: string;
+        createdAt: Date;
     }>;
 }

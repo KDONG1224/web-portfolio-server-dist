@@ -24,15 +24,5 @@
 /// <reference types="mongoose/types/inferschematype" />
 import { Document } from 'mongoose';
 export declare class ToyProjects extends Document {
-    title: string;
-    contents: string;
-    index: number;
-    status: string;
-    readonly readOnlyData: {
-        title: string;
-        contents: string;
-        status: string;
-        index: number;
-    };
 }
 export declare const ToyProjectsSchema: import("mongoose").Schema<ToyProjects, import("mongoose").Model<ToyProjects, any, any, any, any>, {}, {}, {}, {}, "type", ToyProjects>;

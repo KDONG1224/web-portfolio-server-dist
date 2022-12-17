@@ -44,7 +44,7 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], ToyProjectsController.prototype, "getToyProject", null);
 __decorate([
-    (0, common_1.Get)('eIdFind/:gameName'),
+    (0, common_1.Get)('eidFind/:gameName'),
     __param(0, (0, common_1.Param)('gameName')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),

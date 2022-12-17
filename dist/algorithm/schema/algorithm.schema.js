@@ -155,6 +155,13 @@ __decorate([
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], Algorithm.prototype, "status", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({
+        required: false,
+    }),
+    (0, class_validator_1.IsDate)(),
+    __metadata("design:type", Date)
+], Algorithm.prototype, "createdAt", void 0);
 Algorithm = __decorate([
     (0, mongoose_1.Schema)(options)
 ], Algorithm);
@@ -174,6 +181,7 @@ _AlgorithmSchema.virtual('readOnlyData').get(function () {
         thumbmnaile: this.thumbmnaile,
         status: this.status,
         index: this.index,
+        createdAt: this.createdAt,
         id: this.id,
     };
 });

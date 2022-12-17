@@ -1,9 +1,32 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
 };
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
@@ -19,8 +42,9 @@ exports.EventRepository = void 0;
 const common_1 = require("@nestjs/common");
 const mongoose_1 = require("@nestjs/mongoose");
 const moment_1 = __importDefault(require("moment"));
-const mongoose_2 = require("mongoose");
+const mongoose_2 = __importStar(require("mongoose"));
 const toy_projects_repository_1 = require("../../toy-projects/repository/toy-projects.repository");
+const toy_projects_schema_1 = require("../../toy-projects/schema/toy-projects.schema");
 const event_schema_1 = require("../schema/event.schema");
 const getTransactionDay = () => {
     return new Date();
@@ -31,31 +55,10 @@ let EventRepository = class EventRepository {
         this.toyProjectsRepository = toyProjectsRepository;
     }
     async checkEvent(eId) {
-        const product = await this.toyProjectsRepository.find({
-            where: {
-                id: eId,
-            },
-        });
-        product.then((res) => {
-            if (!res) {
-                return null;
-            }
-            const startDay = res.period[0];
-            const eventPeriod = res.eventPeriod;
-            const eventStart = (0, moment_1.default)(startDay).format('YYYY-MM-DD HH:mm:ss');
-            const eventEnd = (0, moment_1.default)(startDay)
-                .add(eventPeriod, 'day')
-                .format('YYYY-MM-DD HH:mm:ss');
-            const endTime = (0, moment_1.default)(eventEnd).endOf('day');
-            const today = (0, moment_1.default)();
-            let period = {
-                eventStart,
-                eventEnd,
-                active: today.isBetween(eventStart, endTime),
-                result: res,
-            };
-            return period;
-        });
+        console.log('eId : ', eId);
+        const toyModel = mongoose_2.default.model('toyprojects', toy_projects_schema_1.ToyProjectsSchema);
+        const product = await toyModel.findById(eId);
+        console.log(product);
     }
     async findAll() {
         const res = await this.eventModel.find();
@@ -261,14 +264,16 @@ let EventRepository = class EventRepository {
         });
     }
     async myRanking(eId, userToken, req) {
-        const name = req.result.name;
-        const phone = req.result.phone;
-        const memberNo = req.result.memberNo;
+        console.log('eId : ', eId, 'userToken : ', userToken, 'req : ', req.result);
+        const name = req.result ? req.result.name : 'kdong';
+        const phone = req.result ? req.result.phone : '01023772418';
+        const memberNo = req.result ? req.result.memberNo : '123';
         let eventActive = '';
         if (!userToken) {
             throw new Error('no token');
         }
         const checkEventDate = this.checkEvent(eId);
+        console.log('checkEventDate : ', checkEventDate);
         let resultData;
         checkEventDate
             .then((eventDate) => {

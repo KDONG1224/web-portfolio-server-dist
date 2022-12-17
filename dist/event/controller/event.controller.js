@@ -8,6 +8,9 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.EventController = void 0;
 const common_1 = require("@nestjs/common");
@@ -39,7 +42,6 @@ let EventController = class EventController {
         return await this.eventService.playEnd(data);
     }
     async myRanking(eId, userToken, req) {
-        console.log(eId, userToken, req);
         return await this.eventService.myRanking(eId, userToken, req);
     }
     async ranking(eId, rank) {
@@ -102,7 +104,10 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], EventController.prototype, "playEnd", null);
 __decorate([
-    (0, common_1.Get)('/myRanking'),
+    (0, common_1.Get)('/myRanking/:eId/:userToken'),
+    __param(0, (0, common_1.Param)('eId')),
+    __param(1, (0, common_1.Param)('userToken')),
+    __param(2, (0, common_1.Req)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, String, Object]),
     __metadata("design:returntype", Promise)
@@ -151,7 +156,6 @@ __decorate([
 ], EventController.prototype, "highRanking", null);
 EventController = __decorate([
     (0, swagger_1.ApiTags)('Event'),
-    (0, swagger_1.ApiExcludeController)(),
     (0, common_1.Controller)('event'),
     __metadata("design:paramtypes", [event_service_1.EventService])
 ], EventController);
