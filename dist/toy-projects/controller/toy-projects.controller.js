@@ -23,10 +23,10 @@ let ToyProjectsController = class ToyProjectsController {
     getAllToyProjects() {
         return this.toyProjectsService.getAllToyProjects();
     }
-    getToyProject(filter) {
-        return this.toyProjectsService.getToyProject(filter);
+    getToyProject(id) {
+        return this.toyProjectsService.getToyProject(id);
     }
-    getEidFind(gameName) {
+    getEid(gameName) {
         return this.toyProjectsService.getEid(gameName);
     }
 };
@@ -37,19 +37,19 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], ToyProjectsController.prototype, "getAllToyProjects", null);
 __decorate([
-    (0, common_1.Get)('/:filter'),
-    __param(0, (0, common_1.Param)('filter')),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
-    __metadata("design:returntype", void 0)
-], ToyProjectsController.prototype, "getToyProject", null);
-__decorate([
-    (0, common_1.Get)('eidFind/:gameName'),
-    __param(0, (0, common_1.Param)('gameName')),
+    (0, common_1.Get)(':id'),
+    __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
-], ToyProjectsController.prototype, "getEidFind", null);
+], ToyProjectsController.prototype, "getToyProject", null);
+__decorate([
+    (0, common_1.Get)('/eidFind'),
+    __param(0, (0, common_1.Query)('gameName')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], ToyProjectsController.prototype, "getEid", null);
 ToyProjectsController = __decorate([
     (0, swagger_1.ApiTags)('Toy-Projects'),
     (0, common_1.Controller)('toy-projects'),

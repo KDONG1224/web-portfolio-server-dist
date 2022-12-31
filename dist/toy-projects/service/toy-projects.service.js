@@ -20,8 +20,8 @@ let ToyProjectsService = class ToyProjectsService {
         const allToyProjects = await this.toyProjectsRepository.findAll();
         return allToyProjects;
     }
-    async getToyProject(filter) {
-        const toyproject = await this.toyProjectsRepository.find(filter);
+    async getToyProject(id) {
+        const toyproject = await this.toyProjectsRepository.findById(id);
         return toyproject;
     }
     async getEid(gameName) {

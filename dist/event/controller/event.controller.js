@@ -26,20 +26,14 @@ let EventController = class EventController {
     async enterV2() {
         return await this.eventService.enterV2();
     }
-    async playStart(eId, req) {
-        return await this.eventService.playStart(eId, req);
+    async playStart(playStartData) {
+        const { eId, userToken } = playStartData;
+        return await this.eventService.playStart(eId, userToken);
     }
-    async playEnd(eId, score, coin, userToken, defaultScore, req) {
-        console.log(eId, score, coin, userToken, defaultScore, req);
-        const data = {
-            eId,
-            score,
-            coin,
-            userToken,
-            defaultScore,
-            req,
-        };
-        return await this.eventService.playEnd(data);
+    async playEnd(playEndData) {
+        console.log(playEndData);
+        const { eId, userToken, coin, score, defaultScore } = playEndData;
+        return await this.eventService.playEnd(eId, userToken, coin, score, defaultScore);
     }
     async myRanking(eId, userToken, req) {
         return await this.eventService.myRanking(eId, userToken, req);
@@ -49,7 +43,6 @@ let EventController = class EventController {
         return await this.eventService.ranking(eId, rank);
     }
     async profile(eId, userToken, req) {
-        console.log(eId, userToken, req);
         return await this.eventService.profile(eId, userToken, req);
     }
     async buy(eId, char, userToken, req) {
@@ -93,20 +86,22 @@ __decorate([
 ], EventController.prototype, "enterV2", null);
 __decorate([
     (0, common_1.Post)('/playStart'),
+    __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], EventController.prototype, "playStart", null);
 __decorate([
     (0, common_1.Post)('/playEnd'),
+    __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, String, Object, String, Object, Object]),
+    __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], EventController.prototype, "playEnd", null);
 __decorate([
-    (0, common_1.Get)('/myRanking/:eId/:userToken'),
-    __param(0, (0, common_1.Param)('eId')),
-    __param(1, (0, common_1.Param)('userToken')),
+    (0, common_1.Get)('/myRanking'),
+    __param(0, (0, common_1.Query)('eId')),
+    __param(1, (0, common_1.Query)('userToken')),
     __param(2, (0, common_1.Req)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, String, Object]),
@@ -120,6 +115,9 @@ __decorate([
 ], EventController.prototype, "ranking", null);
 __decorate([
     (0, common_1.Get)('/profile'),
+    __param(0, (0, common_1.Query)('eId')),
+    __param(1, (0, common_1.Query)('userToken')),
+    __param(2, (0, common_1.Req)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, String, Object]),
     __metadata("design:returntype", Promise)

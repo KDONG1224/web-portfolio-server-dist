@@ -21,8 +21,8 @@
 /// <reference types="mongoose/types/utility" />
 /// <reference types="mongoose/types/validation" />
 /// <reference types="mongoose/types/virtuals" />
+/// <reference types="mongoose" />
 /// <reference types="mongoose/types/inferschematype" />
-import { FilterQuery } from 'mongoose';
 import { ToyProjectsRepository } from '../repository/toy-projects.repository';
 export declare class ToyProjectsService {
     private readonly toyProjectsRepository;
@@ -30,6 +30,6 @@ export declare class ToyProjectsService {
     getAllToyProjects(): Promise<(import("../schema/toy-projects.schema").ToyProjects & {
         _id: import("mongoose").Types.ObjectId;
     })[]>;
-    getToyProject(filter: FilterQuery<any>): Promise<any>;
+    getToyProject(id: string): Promise<any>;
     getEid(gameName: string): Promise<any>;
 }

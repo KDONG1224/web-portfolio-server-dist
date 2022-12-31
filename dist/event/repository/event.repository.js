@@ -1,32 +1,9 @@
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
 };
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
@@ -42,23 +19,50 @@ exports.EventRepository = void 0;
 const common_1 = require("@nestjs/common");
 const mongoose_1 = require("@nestjs/mongoose");
 const moment_1 = __importDefault(require("moment"));
-const mongoose_2 = __importStar(require("mongoose"));
+const mongoose_2 = require("mongoose");
 const toy_projects_repository_1 = require("../../toy-projects/repository/toy-projects.repository");
 const toy_projects_schema_1 = require("../../toy-projects/schema/toy-projects.schema");
 const event_schema_1 = require("../schema/event.schema");
 const getTransactionDay = () => {
     return new Date();
 };
+const getMemberNo = (phone) => {
+    const year = (0, moment_1.default)(new Date()).format('YYYYMM').toString();
+    const fourNumber = phone.split(':')[1].slice(7, 12);
+    return year + fourNumber;
+};
 let EventRepository = class EventRepository {
-    constructor(eventModel, toyProjectsRepository) {
+    constructor(eventModel, toyProjectsRepository, toyProjectModel) {
         this.eventModel = eventModel;
         this.toyProjectsRepository = toyProjectsRepository;
+        this.toyProjectModel = toyProjectModel;
     }
-    async checkEvent(eId) {
-        console.log('eId : ', eId);
-        const toyModel = mongoose_2.default.model('toyprojects', toy_projects_schema_1.ToyProjectsSchema);
-        const product = await toyModel.findById(eId);
-        console.log(product);
+    checkEvent(eId) {
+        const product = this.toyProjectModel.findById(eId);
+        let _period = {};
+        product
+            .then((res) => {
+            console.log('res : ', res);
+            const startDay = res.period;
+            const eventPeriod = res.eventPeriod;
+            const eventStart = (0, moment_1.default)(startDay).format('YYYY-MM-DD HH:mm:ss');
+            const eventEnd = (0, moment_1.default)(startDay)
+                .add(eventPeriod, 'day')
+                .format('YYYY-MM-DD HH:mm:ss');
+            const endTime = (0, moment_1.default)(eventEnd).endOf('day');
+            const today = (0, moment_1.default)();
+            return (_period = {
+                eventStart,
+                eventEnd,
+                active: today.isBetween(eventStart, endTime),
+                result: res,
+            });
+        })
+            .then((res) => console.log(res))
+            .catch((err) => {
+            console.error(err);
+        });
+        return _period;
     }
     async findAll() {
         const res = await this.eventModel.find();
@@ -67,11 +71,15 @@ let EventRepository = class EventRepository {
     async enterV2(data) {
         return data;
     }
-    async playStart(eId, req) {
-        const name = req.result.name;
-        const phone = req.result.phone;
-        const memberNo = req.result.memberNo;
+    async playStart(eId, userToken) {
+        const userInfo = userToken.split(':')[1];
+        const name = userToken.split(':')[0];
+        const phone = userToken.split(':')[1];
+        const memberNo = getMemberNo(userToken);
         const days = new Date();
+        if (!userInfo) {
+            throw new Error('no userInfo');
+        }
         const res = await this.eventModel.create({
             eId,
             name,
@@ -82,31 +90,31 @@ let EventRepository = class EventRepository {
         });
         return res;
     }
-    async palyEnd(data) {
-        const { eId, score, coin, userToken, defaultScore, req } = data;
-        const days = new Date();
-        const name = req.result.name;
-        const phone = req.result.phone;
-        const memberNo = req.result.memberNo;
+    async palyEnd(eId, userToken, coin, score, defaultScore) {
+        const days = getTransactionDay();
+        const name = userToken.split(':')[0];
+        const phone = userToken.split(':')[1];
+        const memberNo = getMemberNo(userToken);
         const _defaultScore = defaultScore ? defaultScore : 400;
         if (!userToken) {
-            console.log('no token');
-            return;
+            throw new Error('no userToken');
         }
-        const checkEventDate = await this.toyProjectsRepository.find({
-            _id: eId,
-        });
-        let myScore = Number(score);
-        let totalCoin = 0;
-        let resultTotalScore = 0;
-        let resultHighScore = 0;
-        let createUser;
-        checkEventDate
-            .then((eventDate) => {
-            if (!eventDate.active) {
-                throw new Error('no event');
+        const checkEventDate = await this.toyProjectsRepository.checkEvent(eId);
+        try {
+            if (!checkEventDate || checkEventDate.active !== true) {
+                throw new common_1.HttpException({
+                    statusCode: common_1.HttpStatus.BAD_REQUEST,
+                    message: '이벤트가 존재하지 않습니다.',
+                }, common_1.HttpStatus.BAD_REQUEST);
             }
-            return this.eventModel.aggregate([
+            let myScore = Number(score);
+            let totalCoin = 0;
+            let resultTotalScore = 0;
+            let resultHighScore = 0;
+            let createUser;
+            let eventActive = checkEventDate.active;
+            this.eventModel
+                .aggregate([
                 {
                     $match: {
                         state: 'normal',
@@ -130,341 +138,356 @@ let EventRepository = class EventRepository {
                     },
                 },
                 { $sort: { score: -1 } },
-            ]);
-        })
-            .then((userInfo) => {
-            let totalScore = userInfo.length ? userInfo[0].totalScore : 0;
-            let highScore = userInfo.length ? userInfo[0].highScore : 0;
-            resultTotalScore = totalScore ? totalScore + myScore : myScore;
-            resultHighScore =
-                highScore && highScore > myScore ? highScore : myScore;
-            return this.eventModel.findOne({
-                where: {
-                    eId,
-                    memberNo,
-                    state: 'start',
-                },
-                order: 'created DESC',
-            });
-        })
-            .then((e) => {
-            let time = Math.floor(Math.abs(new Date().getTime() - e.created.getTime()) / 1000);
-            let getMaxScore = time * _defaultScore;
-            if (defaultScore === '0' || getMaxScore > score) {
-                return this.eventModel.update({
-                    id: e.id,
-                }, {
-                    score,
-                    totalScore: resultTotalScore,
-                    highScore: resultHighScore,
-                    state: 'normal',
-                    day: (0, moment_1.default)(days).format('YYYY-MM-DD HH:mm:ss'),
+            ])
+                .then((userInfo) => {
+                let totalScore = userInfo.length ? userInfo[0].totalScore : 0;
+                let highScore = userInfo.length ? userInfo[0].highScore : 0;
+                resultTotalScore = totalScore ? totalScore + myScore : myScore;
+                resultHighScore =
+                    highScore && highScore > myScore ? highScore : myScore;
+                return this.eventModel.findOne({
+                    where: {
+                        eId,
+                        memberNo,
+                        state: 'start',
+                    },
+                    order: 'created DESC',
                 });
-            }
-            else {
-                throw new Error('비정상적 점수입니다.');
-            }
-        })
-            .then((createUserData) => {
-            createUser = createUserData;
-            const exists = this.eventModel.exists({
-                memberNo: memberNo,
-                state: 'score',
-                eId: eId,
-            });
-            if (!exists) {
-                return this.eventModel.create({
-                    eId,
-                    name,
-                    phone,
-                    memberNo,
-                    totalScore: resultTotalScore,
-                    highScore: resultHighScore,
-                    state: 'score',
-                    day: (0, moment_1.default)(days).format('YYYY-MM-DD HH:mm:ss'),
-                });
-            }
-            else {
-                return exists.update({
-                    eId,
-                    name,
-                    phone,
-                    memberNo,
-                    totalScore: resultTotalScore,
-                    highScore: resultHighScore,
-                    state: 'score',
-                    day: (0, moment_1.default)(days).format('YYYY-MM-DD HH:mm:ss'),
-                });
-            }
-        })
-            .then(() => {
-            return this.eventModel
-                .find({
-                where: {
-                    memberNo: memberNo,
-                    state: 'profile',
-                    eId: eId,
-                },
             })
-                .then((profileUserInfo) => {
-                if (profileUserInfo.length) {
-                    totalCoin =
-                        Number(profileUserInfo[0].coin) + Number(coin ? coin : '');
-                    const exists = this.eventModel.exists({
-                        memberNo: memberNo,
-                        state: 'profile',
-                        eId: eId,
+                .then((e) => {
+                let time = Math.floor(Math.abs(new Date().getTime() - e.createdAt.getTime()) / 1000);
+                let getMaxScore = time * _defaultScore;
+                if (defaultScore === 0 || getMaxScore > score) {
+                    return this.eventModel.updateOne({
+                        id: e.id,
+                    }, {
+                        score,
+                        totalScore: resultTotalScore,
+                        highScore: resultHighScore,
+                        state: 'normal',
+                        day: (0, moment_1.default)(days).format('YYYY-MM-DD HH:mm:ss'),
                     });
-                    if (!exists) {
-                        return this.eventModel.create({
-                            eId,
-                            name,
-                            phone,
-                            memberNo,
-                            coin: totalCoin,
-                            state: 'profile',
-                            day: (0, moment_1.default)(days).format('YYYY-MM-DD HH:mm:ss'),
-                        });
-                    }
-                    else {
-                        return exists.update({
-                            eId,
-                            name,
-                            phone,
-                            memberNo,
-                            coin: totalCoin,
-                            state: 'profile',
-                            day: (0, moment_1.default)(days).format('YYYY-MM-DD HH:mm:ss'),
-                        });
-                    }
                 }
                 else {
+                    throw new Error('비정상적 점수입니다.');
+                }
+            })
+                .then((createUserData) => {
+                console.log('createUserData : ', createUserData);
+                createUser = createUserData;
+                const exists = this.eventModel
+                    .findOne({
+                    memberNo: memberNo,
+                    state: 'score',
+                    eId: eId,
+                })
+                    .exec();
+                console.log('exists : ', exists);
+                if (!exists) {
                     return this.eventModel.create({
                         eId,
                         name,
                         phone,
                         memberNo,
-                        score,
-                        coin,
-                        selectChar: 'char0',
-                        charList: ['1', '0', '0', '0', '0'],
-                        state: 'profile',
+                        totalScore: resultTotalScore,
+                        highScore: resultHighScore,
+                        state: 'score',
                         day: (0, moment_1.default)(days).format('YYYY-MM-DD HH:mm:ss'),
                     });
                 }
+                else {
+                }
+            })
+                .then(() => {
+                return this.eventModel
+                    .find({
+                    where: {
+                        memberNo: memberNo,
+                        state: 'profile',
+                        eId: eId,
+                    },
+                })
+                    .then((profileUserInfo) => {
+                    if (profileUserInfo.length) {
+                        totalCoin =
+                            Number(profileUserInfo[0].coin) + Number(coin ? coin : '');
+                        const exists = this.eventModel.exists({
+                            memberNo: memberNo,
+                            state: 'profile',
+                            eId: eId,
+                        });
+                        if (!exists) {
+                            return this.eventModel.create({
+                                eId,
+                                name,
+                                phone,
+                                memberNo,
+                                coin: totalCoin,
+                                state: 'profile',
+                                day: (0, moment_1.default)(days).format('YYYY-MM-DD HH:mm:ss'),
+                            });
+                        }
+                        else {
+                            return exists.update({
+                                eId,
+                                name,
+                                phone,
+                                memberNo,
+                                coin: totalCoin,
+                                state: 'profile',
+                                day: (0, moment_1.default)(days).format('YYYY-MM-DD HH:mm:ss'),
+                            });
+                        }
+                    }
+                    else {
+                        return this.eventModel.create({
+                            eId,
+                            name,
+                            phone,
+                            memberNo,
+                            score,
+                            coin,
+                            selectChar: 'char0',
+                            charList: ['1', '0', '0', '0', '0'],
+                            state: 'profile',
+                            day: (0, moment_1.default)(days).format('YYYY-MM-DD HH:mm:ss'),
+                        });
+                    }
+                });
+            })
+                .then(() => {
+                console.log('end', new Date());
+                return;
+            })
+                .catch((error) => {
+                console.error(error);
+                return;
             });
-        })
-            .then(() => {
-            console.log('end', new Date());
-            return;
-        })
-            .catch((error) => {
+        }
+        catch (error) {
             console.error(error);
-            return;
-        });
+        }
     }
     async myRanking(eId, userToken, req) {
-        console.log('eId : ', eId, 'userToken : ', userToken, 'req : ', req.result);
-        const name = req.result ? req.result.name : 'kdong';
-        const phone = req.result ? req.result.phone : '01023772418';
-        const memberNo = req.result ? req.result.memberNo : '123';
+        console.log('== eId == : ', eId);
+        console.log('== userToken == : ', userToken);
+        let noTokenName = '';
+        let noTokenPhone = '';
+        noTokenName = userToken.split(':')[0];
+        noTokenPhone = userToken.split(':')[1];
+        const userInfo = req.result ? req.result.memberNo : noTokenPhone;
+        const name = req.result ? req.result.name : noTokenName;
+        const phone = req.result ? req.result.phone : noTokenPhone;
+        const memberNo = getMemberNo(userToken);
         let eventActive = '';
-        if (!userToken) {
+        if (!userInfo) {
             throw new Error('no token');
         }
-        const checkEventDate = this.checkEvent(eId);
-        console.log('checkEventDate : ', checkEventDate);
-        let resultData;
-        checkEventDate
-            .then((eventDate) => {
-            eventActive = eventDate.active;
-            return this.eventModel.findOne({
-                where: {
-                    memberNo: memberNo,
+        const checkEventDate = await this.toyProjectsRepository.checkEvent(eId);
+        try {
+            if (!checkEventDate || checkEventDate.active !== true) {
+                throw new common_1.HttpException({
+                    statusCode: common_1.HttpStatus.BAD_REQUEST,
+                    message: '이벤트가 존재하지 않습니다.',
+                }, common_1.HttpStatus.BAD_REQUEST);
+            }
+            let resultData;
+            eventActive = checkEventDate.active;
+            const result = await this.eventModel
+                .findOne({
+                name,
+                phone,
+                state: 'score',
+                eId,
+            })
+                .then((UserInfo) => {
+                if (eId !== '6372f72ef67734db2bbb2716') {
+                    if (UserInfo) {
+                        resultData =
+                            '|' +
+                                UserInfo.name.replace(/(?<=.{1})./gi, '*') +
+                                '|' +
+                                UserInfo.phone +
+                                '|' +
+                                UserInfo.memberNo +
+                                '|' +
+                                UserInfo.totalScore +
+                                '|' +
+                                UserInfo.highScore +
+                                '|' +
+                                UserInfo.totalRank +
+                                '|' +
+                                UserInfo.highRank +
+                                '등' +
+                                '|';
+                    }
+                    else {
+                        resultData =
+                            '|' +
+                                name.replace(/(?<=.{1})./gi, '*') +
+                                '|' +
+                                phone +
+                                '|' +
+                                memberNo +
+                                '|' +
+                                '0' +
+                                '|' +
+                                '0' +
+                                '|' +
+                                '0' +
+                                '|' +
+                                '0등' +
+                                '|';
+                    }
+                }
+                else {
+                    if (UserInfo) {
+                        resultData =
+                            '|' +
+                                UserInfo.name.replace(/(?<=.{1})./gi, '*') +
+                                '|' +
+                                UserInfo.phone +
+                                '|' +
+                                UserInfo.memberNo +
+                                '|' +
+                                UserInfo.totalScore +
+                                '|' +
+                                UserInfo.highScore +
+                                '|' +
+                                UserInfo.totalRank +
+                                '|' +
+                                UserInfo.highRank +
+                                '|';
+                    }
+                    else {
+                        resultData =
+                            '|' +
+                                name.replace(/(?<=.{1})./gi, '*') +
+                                '|' +
+                                phone +
+                                '|' +
+                                memberNo +
+                                '|' +
+                                '0' +
+                                '|' +
+                                '0' +
+                                '|' +
+                                '0' +
+                                '|' +
+                                '0' +
+                                '|';
+                    }
+                }
+                return this.eventModel.findOne({
                     state: 'score',
                     eId: eId,
-                },
-            });
-        })
-            .then((UserInfo) => {
-            if (eId !== '6372f72ef67734db2bbb2716') {
-                if (UserInfo) {
-                    resultData =
-                        '|' +
-                            UserInfo.name.replace(/(?<=.{1})./gi, '*') +
-                            '|' +
-                            UserInfo.phone +
-                            '|' +
-                            UserInfo.memberNo +
-                            '|' +
-                            UserInfo.totalScore +
-                            '|' +
-                            UserInfo.highScore +
-                            '|' +
-                            UserInfo.totalRank +
-                            '|' +
-                            UserInfo.highRank +
-                            '등' +
-                            '|';
+                    order: 'totalScore DESC',
+                });
+            })
+                .then((totalUserInfo) => {
+                if (totalUserInfo) {
+                    resultData = resultData + totalUserInfo.totalScore;
                 }
                 else {
-                    resultData =
-                        '|' +
-                            name.replace(/(?<=.{1})./gi, '*') +
-                            '|' +
-                            phone +
-                            '|' +
-                            memberNo +
-                            '|' +
-                            '0' +
-                            '|' +
-                            '0' +
-                            '|' +
-                            '0' +
-                            '|' +
-                            '0등' +
-                            '|';
+                    resultData = resultData + '0';
                 }
-            }
-            else {
-                if (UserInfo) {
-                    resultData =
-                        '|' +
-                            UserInfo.name.replace(/(?<=.{1})./gi, '*') +
-                            '|' +
-                            UserInfo.phone +
-                            '|' +
-                            UserInfo.memberNo +
-                            '|' +
-                            UserInfo.totalScore +
-                            '|' +
-                            UserInfo.highScore +
-                            '|' +
-                            UserInfo.totalRank +
-                            '|' +
-                            UserInfo.highRank +
-                            '|';
+                return this.eventModel.findOne({
+                    state: 'score',
+                    eId: eId,
+                    order: 'highScore DESC',
+                });
+            })
+                .then((highUserInfo) => {
+                if (highUserInfo) {
+                    resultData = resultData + '|' + highUserInfo.highScore + '|';
                 }
                 else {
-                    resultData =
-                        '|' +
-                            name.replace(/(?<=.{1})./gi, '*') +
-                            '|' +
-                            phone +
-                            '|' +
-                            memberNo +
-                            '|' +
-                            '0' +
-                            '|' +
-                            '0' +
-                            '|' +
-                            '0' +
-                            '|' +
-                            '0' +
-                            '|';
+                    resultData = resultData + '|' + '0' + '|';
                 }
-            }
-            return this.eventModel.findOne({
-                where: { state: 'score', eId: eId },
-                order: 'totalScore DESC',
+                return resultData + eventActive + '|';
+            })
+                .then((myRank) => {
+                return myRank;
+            })
+                .catch((error) => {
+                return console.error(error);
             });
-        })
-            .then((totalUserInfo) => {
-            if (totalUserInfo) {
-                resultData = resultData + totalUserInfo.totalScore;
-            }
-            else {
-                resultData = resultData + '0';
-            }
-            return this.eventModel.findOne({
-                where: { state: 'score', eId: eId },
-                order: 'highScore DESC',
-            });
-        })
-            .then((highUserInfo) => {
-            if (highUserInfo) {
-                resultData = resultData + '|' + highUserInfo.highScore + '|';
-            }
-            else {
-                resultData = resultData + '|' + '0' + '|';
-            }
-            return resultData + eventActive + '|';
-        })
-            .then((myRank) => {
-            return myRank;
-        })
-            .catch((error) => {
-            return console.error(error);
-        });
+            return result;
+        }
+        catch (err) {
+            console.error(err);
+        }
     }
     async ranking(eId, rank) {
         const rankData = await this.eventModel.find({ eId, state: 'rankData' });
         return rankData;
     }
     async profile(eId, userToken, req) {
-        const checkEventDate = this.checkEvent(eId);
-        const memberNo = req.result.memberNo;
+        const checkEventDate = await this.toyProjectsRepository.checkEvent(eId);
+        const memberNo = getMemberNo(userToken);
+        const eventActive = checkEventDate.active;
         if (!userToken) {
             throw new Error('no token');
         }
-        checkEventDate
-            .then((eventDate) => {
-            if (!eventDate.active) {
-                throw new Error('no event');
+        try {
+            if (!checkEventDate || !eventActive) {
+                throw new common_1.HttpException({
+                    statusCode: common_1.HttpStatus.BAD_REQUEST,
+                    message: '이벤트가 존재하지 않습니다.',
+                }, common_1.HttpStatus.BAD_REQUEST);
             }
-            return this.eventModel.find({
-                where: {
-                    memberNo: memberNo,
-                    state: 'profile',
-                    eId: eId,
-                },
+            const result = await this.eventModel
+                .find({ memberNo: memberNo, state: 'profile', eId: eId })
+                .then((userProfile) => {
+                if (!userProfile.length) {
+                    const result = '|' +
+                        0 +
+                        '|' +
+                        'char0' +
+                        '|' +
+                        '1' +
+                        '|' +
+                        '0' +
+                        '|' +
+                        '0' +
+                        '|' +
+                        '0' +
+                        '|' +
+                        '0' +
+                        '|';
+                    return result;
+                }
+                else {
+                    const result = '|' +
+                        userProfile[0].coin +
+                        '|' +
+                        userProfile[0].selectChar +
+                        '|' +
+                        userProfile[0].charList[0] +
+                        '|' +
+                        userProfile[0].charList[1] +
+                        '|' +
+                        userProfile[0].charList[2] +
+                        '|' +
+                        userProfile[0].charList[3] +
+                        '|' +
+                        userProfile[0].charList[4] +
+                        '|';
+                    return result;
+                }
+            })
+                .catch((error) => {
+                return console.error(error);
             });
-        })
-            .then((userProfile) => {
-            if (!userProfile.length) {
-                const result = '|' +
-                    0 +
-                    '|' +
-                    'char0' +
-                    '|' +
-                    '1' +
-                    '|' +
-                    '0' +
-                    '|' +
-                    '0' +
-                    '|' +
-                    '0' +
-                    '|' +
-                    '0' +
-                    '|';
-                return result;
-            }
-            else {
-                const result = '|' +
-                    userProfile[0].coin +
-                    '|' +
-                    userProfile[0].selectChar +
-                    '|' +
-                    userProfile[0].charList[0] +
-                    '|' +
-                    userProfile[0].charList[1] +
-                    '|' +
-                    userProfile[0].charList[2] +
-                    '|' +
-                    userProfile[0].charList[3] +
-                    '|' +
-                    userProfile[0].charList[4] +
-                    '|';
-                return result;
-            }
-        })
-            .catch((error) => {
-            return console.error(error);
-        });
+            return result;
+        }
+        catch (err) {
+            console.error(err);
+        }
     }
     async buy(data, req) {
         const { eId, char, userToken } = data;
-        const checkEventDate = this.checkEvent(eId);
+        const checkEventDate = await this.toyProjectsRepository.checkEvent(eId);
         const memberNo = req.result.memberNo;
         if (!userToken) {
             return console.error('no token');
@@ -662,8 +685,10 @@ let EventRepository = class EventRepository {
 EventRepository = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, mongoose_1.InjectModel)(event_schema_1.Events.name)),
+    __param(2, (0, mongoose_1.InjectModel)(toy_projects_schema_1.ToyProjects.name)),
     __metadata("design:paramtypes", [mongoose_2.Model,
-        toy_projects_repository_1.ToyProjectsRepository])
+        toy_projects_repository_1.ToyProjectsRepository,
+        mongoose_2.Model])
 ], EventRepository);
 exports.EventRepository = EventRepository;
 //# sourceMappingURL=event.repository.js.map

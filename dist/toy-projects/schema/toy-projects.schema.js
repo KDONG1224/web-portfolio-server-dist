@@ -5,21 +5,65 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ToyProjectsSchema = exports.ToyProjects = void 0;
 const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
+const class_validator_1 = require("class-validator");
 const options = {
     timestamps: true,
     versionKey: false,
 };
 let ToyProjects = class ToyProjects extends mongoose_2.Document {
 };
+__decorate([
+    (0, mongoose_1.Prop)({ required: true }),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], ToyProjects.prototype, "status", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ required: false }),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], ToyProjects.prototype, "eventName", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ required: false }),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], ToyProjects.prototype, "gameName", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ required: false }),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], ToyProjects.prototype, "eventAdminName", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ required: false }),
+    (0, class_validator_1.IsNumber)(),
+    __metadata("design:type", Number)
+], ToyProjects.prototype, "eventPeriod", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ required: false }),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", Array)
+], ToyProjects.prototype, "period", void 0);
 ToyProjects = __decorate([
     (0, mongoose_1.Schema)(options)
 ], ToyProjects);
 exports.ToyProjects = ToyProjects;
 const _ToyProjectsSchema = mongoose_1.SchemaFactory.createForClass(ToyProjects);
+_ToyProjectsSchema.virtual('readOnlyData').get(function () {
+    return {
+        eventName: this.eventName,
+        gameName: this.gameName,
+        eventAdminName: this.eventAdminName,
+        eventPeriod: this.eventPeriod,
+        period: this.period,
+        status: this.status,
+    };
+});
 _ToyProjectsSchema.set('toObject', { virtuals: true });
 _ToyProjectsSchema.set('toJSON', { virtuals: true });
 exports.ToyProjectsSchema = _ToyProjectsSchema;

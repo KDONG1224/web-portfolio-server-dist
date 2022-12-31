@@ -4,11 +4,20 @@ export declare class EventController {
     constructor(eventService: EventService);
     getAllEvent(): Promise<any[]>;
     enterV2(): Promise<void>;
-    playStart(eId: string, req: any): Promise<any>;
-    playEnd(eId: string, score: string, coin: any, userToken: string, defaultScore: any, req: any): Promise<void>;
-    myRanking(eId: string, userToken: string, req: Request): Promise<void>;
+    playStart(playStartData: {
+        eId: string;
+        userToken: string;
+    }): Promise<any>;
+    playEnd(playEndData: {
+        eId: string;
+        userToken: string;
+        coin: number;
+        score: number;
+        defaultScore?: number;
+    }): Promise<void>;
+    myRanking(eId: string, userToken: string, req: Request): Promise<string | void>;
     ranking(eId: string, rank: any): Promise<any[]>;
-    profile(eId: string, userToken: string, req: any): Promise<void>;
+    profile(eId: string, userToken: string, req: Request): Promise<string | void>;
     buy(eId: string, char: any, userToken: any, req: any): Promise<void>;
     select(eId: string, char: any, userToken: any, req: any): Promise<void>;
     result(eId: string): Promise<void>;

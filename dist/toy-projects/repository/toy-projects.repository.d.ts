@@ -22,7 +22,7 @@
 /// <reference types="mongoose/types/validation" />
 /// <reference types="mongoose/types/virtuals" />
 /// <reference types="mongoose/types/inferschematype" />
-import { FilterQuery, Model } from 'mongoose';
+import { Model } from 'mongoose';
 import { ToyProjects } from '../schema/toy-projects.schema';
 export declare class ToyProjectsRepository {
     private readonly toyProjectModel;
@@ -30,6 +30,8 @@ export declare class ToyProjectsRepository {
     findAll(): Promise<(ToyProjects & {
         _id: import("mongoose").Types.ObjectId;
     })[]>;
-    find(filter: FilterQuery<any>): Promise<any>;
+    checkEvent(eId: string): Promise<any>;
+    find(filter: any): Promise<any>;
+    findById(id: string): Promise<any>;
     findEid(gameName: string): Promise<any>;
 }

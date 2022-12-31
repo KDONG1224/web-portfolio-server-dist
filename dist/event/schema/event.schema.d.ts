@@ -24,11 +24,25 @@
 /// <reference types="mongoose/types/inferschematype" />
 import { Document } from 'mongoose';
 export declare class Events extends Document {
+    eId: string;
+    name: string;
+    phone: string;
+    memberNo: string;
+    state: string;
+    day: Date;
+    score: number;
+    highScore: number;
+    totalScore: number;
     readonly readOnlyData: {
-        title: string;
-        contents: string;
-        status: string;
-        index: number;
+        eId: string;
+        name: string;
+        phone: string;
+        memberNo: string;
+        state: string;
+        day: Date;
+        score: number;
+        highScore: number;
+        totalScore: number;
     };
 }
 export declare const EventsSchema: import("mongoose").Schema<Events, import("mongoose").Model<Events, any, any, any, any>, {}, {}, {}, {}, "type", Events>;

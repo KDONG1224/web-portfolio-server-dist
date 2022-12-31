@@ -22,12 +22,12 @@ let EventService = class EventService {
     }
     async enterV2() {
     }
-    async playStart(eId, req) {
-        const playStart = await this.eventRepository.playStart(eId, req);
+    async playStart(eId, userToken) {
+        const playStart = await this.eventRepository.playStart(eId, userToken);
         return playStart;
     }
-    async playEnd(data) {
-        const playEnd = await this.eventRepository.palyEnd(data);
+    async playEnd(eId, userToken, coin, score, defaultScore) {
+        const playEnd = await this.eventRepository.palyEnd(eId, userToken, coin, score, defaultScore);
         return playEnd;
     }
     async myRanking(eId, userToken, req) {

@@ -4,11 +4,11 @@ export declare class EventService {
     constructor(eventRepository: EventRepository);
     getAll(): Promise<any[]>;
     enterV2(): Promise<void>;
-    playStart(eId: string, req: any): Promise<any>;
-    playEnd(data: any): Promise<void>;
-    myRanking(eId: string, userToken: string, req: any): Promise<void>;
+    playStart(eId: string, userToken: string): Promise<any>;
+    playEnd(eId: string, userToken: string, coin: number, score: number, defaultScore?: number): Promise<void>;
+    myRanking(eId: string, userToken: string, req: any): Promise<string | void>;
     ranking(eId: string, rank: any): Promise<any[]>;
-    profile(eId: string, userToken: string, req: any): Promise<void>;
+    profile(eId: string, userToken: string, req: any): Promise<string | void>;
     buy(data: any, req: any): Promise<void>;
     select(data: any, req: any): Promise<void>;
     result(eId: string): Promise<void>;
